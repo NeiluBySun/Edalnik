@@ -3,27 +3,28 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.edalnik.edalnik.model.EdalnikModel
 import com.edalnik.edalnik.view.components.BottomBar.BottomNavigationBar
 import com.edalnik.edalnik.view.components.BottomBar.NavigationHost
+import com.edalnik.edalnik.viewmodel.FoodViewModel
 
 
 @Composable
-fun MainScreen() {
-    // Контроллер навигации для управления переходами между экранами
+fun MainScreen(viewModel: FoodViewModel) {
     val navController = rememberNavController()
 
+
     Scaffold(
-        // Нижняя панель навигации
         bottomBar = {
             BottomNavigationBar(navController)
         }
     ) { innerPadding ->
-        // Навигационный хост для отображения экранов в зависимости от текущего маршрута
-        NavigationHost(navController = navController, modifier = Modifier.padding(innerPadding))
+        NavigationHost(navController = navController, modifier = Modifier.padding(innerPadding), viewModel)
     }
 }

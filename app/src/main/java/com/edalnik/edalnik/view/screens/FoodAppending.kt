@@ -1,18 +1,18 @@
+package com.edalnik.edalnik.view.screens
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import me.bytebeats.views.charts.pie.PieChart
-import me.bytebeats.views.charts.pie.PieChartData
-import me.bytebeats.views.charts.pie.render.SimpleSliceDrawer
-import me.bytebeats.views.charts.simpleChartAnimation
+import com.edalnik.edalnik.viewmodel.FoodViewModel
+
 
 @Composable
-fun HomeScreen() {
+fun FoodAppendingScreen(viewModel: FoodViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -21,31 +21,8 @@ fun HomeScreen() {
 
     ) {
         Text(text = "Home Screen")
-        PieChartView()
     }
 }
 
-@Composable
-fun PieChartView() {
-    PieChart(
-        pieChartData = PieChartData(
-            slices = listOf(
-                PieChartData.Slice(
-                    100F,
-                    Color.LightGray
-                ),
-                PieChartData.Slice(
-                    20F,
-                    Color.Yellow
-                ),
-            )
-        ),
-        // Optional properties.
-        modifier = Modifier
-            .size(200.dp),
-        animation = simpleChartAnimation(),
-        sliceDrawer = SimpleSliceDrawer(30F)
-    )
-}
 
 
