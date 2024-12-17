@@ -24,9 +24,9 @@ class FoodViewModel() : ViewModel() {
 //    }
 //
 //
-//    fun getFoodList(): List<FoodItem> {
-//        return repository.getAllFood()
-//    }
+    fun getFoodList(): List<FoodItem> {
+        return repository.getAllFood().toList()
+    }
 //
 //    fun clearAllFood() {
 //        repository.clearAllFood()

@@ -12,27 +12,30 @@ class EdalnikModel() {
     init {
         Log.d("EdalnikModel", "111111111111111");
         foodList = loadFoodData()
-        Log.d("EdalnikModel", "2222222222222222");
+        Log.d("EdalnikModel", foodList.get(0).name);
 
     }
     fun addFood(food: FoodItem) {
         foodList.add(food)
     }
 
-    fun getAllFood(): List<FoodItem> {
-        return foodList.toList()
+    fun getAllFood(): MutableList<FoodItem> {
+        return foodList
     }
 
     fun clearAllFood() {
         foodList.clear()
     }
 
-    fun loadFoodData(): MutableList<FoodItem> {
-        val jsonString = javaClass.getResourceAsStream("/food.json")?.bufferedReader()?.use { it.readText() }
+    private fun loadFoodData(): MutableList<FoodItem> {
+        val inputStream = javaClass.classLoader?.getResourceAsStream("assets/food.json")
             ?: throw IllegalStateException("Cannot find food.json")
 
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+
         val gson = Gson()
-        val listType = object : TypeToken<List<FoodItem>>() {}.type
+        val listType = object : TypeToken<MutableList<FoodItem>>() {}.type
         return gson.fromJson(jsonString, listType)
     }
+
 }
