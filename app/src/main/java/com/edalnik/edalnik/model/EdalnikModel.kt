@@ -8,15 +8,13 @@ import java.io.FileNotFoundException
 
 class EdalnikModel() {
     private val foodList: MutableList<FoodItem>
+    private val choosedFood: MutableList<FoodItem> = mutableListOf()
 
     init {
-        Log.d("EdalnikModel", "111111111111111");
         foodList = loadFoodData()
-        Log.d("EdalnikModel", foodList.get(0).name);
-
     }
     fun addFood(food: FoodItem) {
-        foodList.add(food)
+        choosedFood.add(food)
     }
 
     fun getAllFood(): MutableList<FoodItem> {

@@ -1,7 +1,5 @@
 package com.edalnik.edalnik.viewmodel
 
-import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.edalnik.edalnik.model.FoodItem
 import com.edalnik.edalnik.model.EdalnikModel
@@ -18,12 +16,10 @@ class FoodViewModel() : ViewModel() {
     private val _totalCaloriesState = MutableStateFlow(0)
     val totalCaloriesState: StateFlow<Int> = _totalCaloriesState
 
-//    fun addFood(name: FoodItem, calories: Int, proteins: Double, fats: Double, carbs: Double) {
-//        repository.addFood(name)
-//        _foodListState.value = repository.getAllFood()
-//    }
-//
-//
+    fun addFood(foodItem: FoodItem) {
+        repository.addFood(foodItem)
+    }
+
     fun getFoodList(): List<FoodItem> {
         return repository.getAllFood().toList()
     }

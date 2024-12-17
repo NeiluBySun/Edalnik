@@ -3,12 +3,16 @@ import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -25,7 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.edalnik.edalnik.model.FoodItem
@@ -54,7 +61,9 @@ fun FoodAppendingScreen(viewModel: FoodViewModel) {
 fun ExpandableFoodList(
     foodItems: List<FoodItem>,
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isAddExpanded by remember { mutableStateOf(false) }
+    var isCartExpanded by remember { mutableStateOf(true) }
+
     var searchQuery by remember { mutableStateOf("") }
     val filteredFoodItems = remember(searchQuery, foodItems) {
         if (searchQuery.isEmpty()) {
@@ -65,18 +74,52 @@ fun ExpandableFoodList(
             }
         }
     }
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
+        Text(
+            text = "Добавленные продукты",
+            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 27.sp,
+            fontFamily = FontFamily.SansSerif
+        )
+        AnimatedVisibility(
+            visible = isCartExpanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+
+        ){
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth(0.90F)
+                    .height(400.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF393737))
+
+                    .border(
+                        BorderStroke(2.dp, Color(0xFF7E7E7E)),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {}
+        }
         Button(
-            onClick = { isExpanded = !isExpanded },
+            onClick = {
+                isAddExpanded = !isAddExpanded
+                isCartExpanded = !isCartExpanded
+            },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+                .width(50.dp)
+                .height(50.dp)
+                .padding(8.dp),
+
         ) {
-            Text(text = if (isExpanded) "Свернуть список" else "Выбрать продукты")
+            Text(text = if (isAddExpanded) "Свернуть список" else "Выбрать продукты")
         }
 
         AnimatedVisibility(
-            visible = isExpanded,
+            visible = isAddExpanded,
             enter = expandVertically(),
             exit = shrinkVertically()
         ) {
@@ -86,7 +129,7 @@ fun ExpandableFoodList(
                     .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Поисковая строка
+
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -101,10 +144,6 @@ fun ExpandableFoodList(
                         }
                     }
                 )
-
-
-
-                Spacer(modifier = Modifier.height(15.dp))
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -145,6 +184,16 @@ fun FoodItemRow(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier
+                .width(50.dp)
+                .height(50.dp)
+                .padding(8.dp),
+
+            ) {}
 
     }
 }
