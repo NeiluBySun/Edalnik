@@ -80,7 +80,12 @@ fun ExpandableFoodList(
             enter = expandVertically(),
             exit = shrinkVertically()
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 // Поисковая строка
                 OutlinedTextField(
                     value = searchQuery,
@@ -96,16 +101,20 @@ fun ExpandableFoodList(
                         }
                     }
                 )
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 300.dp)
-            ) {
-                items(foodItems) { foodItem ->
-                    FoodItemRow(
-                        foodItem = foodItem,
-                    )
+
+
+
+                Spacer(modifier = Modifier.height(15.dp))
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp)
+                ) {
+                    items(filteredFoodItems) { foodItem ->
+                        FoodItemRow(
+                            foodItem = foodItem,
+                        )
+                    }
                 }
             }
         }
