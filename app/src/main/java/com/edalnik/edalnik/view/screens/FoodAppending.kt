@@ -1,21 +1,18 @@
 package com.edalnik.edalnik.view.screens
-import android.content.Context
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,22 +23,23 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.edalnik.edalnik.model.FoodItem
 import com.edalnik.edalnik.viewmodel.FoodViewModel
+import com.edalnik.edalnik.R
 
 
 @Composable
 fun FoodAppendingScreen(viewModel: FoodViewModel) {
-    val selectedItems = remember { mutableStateListOf<FoodItem>() }
 
     Box(
         modifier = Modifier
@@ -51,7 +49,7 @@ fun FoodAppendingScreen(viewModel: FoodViewModel) {
 
     ) {
         ExpandableFoodList(
-            viewModel.getFoodList()
+            viewModel
         )
     }
 }
@@ -59,10 +57,13 @@ fun FoodAppendingScreen(viewModel: FoodViewModel) {
 
 @Composable
 fun ExpandableFoodList(
-    foodItems: List<FoodItem>,
+    viewModel: FoodViewModel
 ) {
     var isAddExpanded by remember { mutableStateOf(false) }
     var isCartExpanded by remember { mutableStateOf(true) }
+    val chosenFoodItems = viewModel.getChosenFood()
+
+    val foodItems = viewModel.getFoodList()
 
     var searchQuery by remember { mutableStateOf("") }
     val filteredFoodItems = remember(searchQuery, foodItems) {
@@ -80,7 +81,7 @@ fun ExpandableFoodList(
 
     ) {
         Text(
-            text = "Добавленные продукты",
+            text = if (isCartExpanded) "Добавленные продукты" else "Добавьте продукты",
             style = MaterialTheme.typography.bodyLarge,
             fontSize = 27.sp,
             fontFamily = FontFamily.SansSerif
@@ -97,12 +98,26 @@ fun ExpandableFoodList(
                     .height(400.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color(0xFF393737))
-
                     .border(
                         BorderStroke(2.dp, Color(0xFF7E7E7E)),
                         shape = RoundedCornerShape(16.dp)
                     )
-            ) {}
+                    .padding(horizontal = 10.dp)
+
+            ) {
+                items(chosenFoodItems) { foodItem ->
+                    FoodItemRow(
+                        foodItem = foodItem,
+                        onFoodRowClick = {
+                                reducedFoodItem -> viewModel.reduceChosenAmount(reducedFoodItem)
+                        },
+                        isChosen = foodItem.isChosen,
+                        onDeleteAllAmount = {
+                            deletedFoodItem -> viewModel.deleteChosenRow(deletedFoodItem)
+                        }
+                    )
+                }
+            }
         }
         Button(
             onClick = {
@@ -115,7 +130,6 @@ fun ExpandableFoodList(
                 .padding(8.dp),
 
         ) {
-            Text(text = if (isAddExpanded) "Свернуть список" else "Выбрать продукты")
         }
 
         AnimatedVisibility(
@@ -152,6 +166,9 @@ fun ExpandableFoodList(
                     items(filteredFoodItems) { foodItem ->
                         FoodItemRow(
                             foodItem = foodItem,
+                            onFoodRowClick = {
+                                appendingFoodItem -> viewModel.addFood(appendingFoodItem)
+                            }
                         )
                     }
                 }
@@ -163,6 +180,9 @@ fun ExpandableFoodList(
 @Composable
 fun FoodItemRow(
     foodItem: FoodItem,
+    onFoodRowClick: (FoodItem) -> Unit,
+    isChosen: Boolean = false,
+    onDeleteAllAmount: (FoodItem) -> Unit = {_ ->}
 ) {
     Row(
         modifier = Modifier
@@ -175,7 +195,7 @@ fun FoodItemRow(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = foodItem.name,
+                text = "${foodItem.name} ",
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
@@ -183,18 +203,51 @@ fun FoodItemRow(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
+            if(isChosen) {
+                Text(
+                    text = "x${foodItem.amount}",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
-        Button(
-            onClick = {
-
-            },
+        IconButton(
+            onClick = {onFoodRowClick(foodItem)},
             modifier = Modifier
                 .width(50.dp)
                 .height(50.dp)
                 .padding(8.dp),
 
-            ) {}
+            ) {
+            Icon(
+                painter = painterResource(
+                    if (isChosen) R.drawable.minus else R.drawable.plus
+                ),
+                contentDescription = "Delete all chosen",
+                tint = Color(0xFF7E7E7E)
+            )
+        }
+        if(isChosen) {
+            IconButton(
+                onClick = {onDeleteAllAmount(foodItem)},
+                modifier = Modifier
+                    .width(45.dp)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(16.dp)),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = Color(0xFFB22222), // Основной цвет кнопки
+//                    contentColor = Color.White,        // Цвет текста или иконок
+//                    disabledContainerColor = Color.Gray, // Цвет кнопки в неактивном состоянии
+//                    disabledContentColor = Color.LightGray // Цвет текста в неактивном состоянии
+//                ),
 
+                ) {
+                Icon(
+                    painter = painterResource(R.drawable.trashcan),
+                    contentDescription = "Delete all chosen",
+                    tint = Color(0xFF7E7E7E)
+                )
+            }
+        }
     }
 }
 

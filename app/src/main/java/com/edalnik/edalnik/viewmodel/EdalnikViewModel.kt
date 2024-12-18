@@ -17,16 +17,26 @@ class FoodViewModel() : ViewModel() {
     val totalCaloriesState: StateFlow<Int> = _totalCaloriesState
 
     fun addFood(foodItem: FoodItem) {
-        repository.addFood(foodItem)
+        foodItem.isChosen = true
+        val isExist = repository.isExistOnChosen(foodItem)
+        if (!isExist) {
+            repository.addFood(foodItem)
+        }
     }
 
     fun getFoodList(): List<FoodItem> {
         return repository.getAllFood().toList()
     }
-//
-//    fun clearAllFood() {
-//        repository.clearAllFood()
-//        _foodListState.value = emptyList()
-//        _totalCaloriesState.value = 0
-//    }
+
+    fun getChosenFood(): List<FoodItem> {
+        return repository.getChosenFood().toList()
+    }
+
+    fun reduceChosenAmount(foodItem: FoodItem) {
+        repository.reduceChosenAmount(foodItem)
+    }
+
+    fun deleteChosenRow(foodItem: FoodItem) {
+        repository.deleteChosenRow(foodItem)
+    }
 }
