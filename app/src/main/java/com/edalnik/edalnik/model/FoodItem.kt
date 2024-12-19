@@ -1,5 +1,7 @@
 package com.edalnik.edalnik.model
 
+import kotlinx.coroutines.flow.MutableStateFlow
+
 data class FoodItem(
     val name: String,
     val calories: String,
@@ -7,5 +9,5 @@ data class FoodItem(
     val fats: String = "0.0",
     val carbs: String = "0.0",
     var isChosen: Boolean = false,
-    var amount: Int = 1
+    var amount: MutableStateFlow<Int> = MutableStateFlow(1)
 )

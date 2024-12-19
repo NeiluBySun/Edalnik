@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 class FoodViewModel() : ViewModel() {
 
     private val repository = EdalnikModel()
+    val chosenFood: StateFlow<List<FoodItem>> = repository.chosenFood
 
     private val _foodListState = MutableStateFlow<List<FoodItem>>(emptyList())
     val foodListState: StateFlow<List<FoodItem>> = _foodListState
@@ -28,9 +29,6 @@ class FoodViewModel() : ViewModel() {
         return repository.getAllFood().toList()
     }
 
-    fun getChosenFood(): List<FoodItem> {
-        return repository.getChosenFood().toList()
-    }
 
     fun reduceChosenAmount(foodItem: FoodItem) {
         repository.reduceChosenAmount(foodItem)

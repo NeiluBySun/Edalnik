@@ -1,5 +1,7 @@
 package com.edalnik.edalnik.view.screens
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -18,10 +20,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.edalnik.edalnik.model.FoodItem
 import com.edalnik.edalnik.viewmodel.FoodViewModel
 import com.edalnik.edalnik.R
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -61,7 +66,7 @@ fun ExpandableFoodList(
 ) {
     var isAddExpanded by remember { mutableStateOf(false) }
     var isCartExpanded by remember { mutableStateOf(true) }
-    val chosenFoodItems = viewModel.getChosenFood()
+    val chosenFoodItems by viewModel.chosenFood.collectAsState()
 
     val foodItems = viewModel.getFoodList()
 
@@ -106,6 +111,7 @@ fun ExpandableFoodList(
 
             ) {
                 items(chosenFoodItems) { foodItem ->
+                    Log.d("ABOBA","1")
                     FoodItemRow(
                         foodItem = foodItem,
                         onFoodRowClick = {
@@ -184,6 +190,8 @@ fun FoodItemRow(
     isChosen: Boolean = false,
     onDeleteAllAmount: (FoodItem) -> Unit = {_ ->}
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -204,14 +212,18 @@ fun FoodItemRow(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
             if(isChosen) {
+                val amount by foodItem.amount.collectAsState()
                 Text(
-                    text = "x${foodItem.amount}",
+                    text = "x${amount}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
         IconButton(
-            onClick = {onFoodRowClick(foodItem)},
+            onClick = {
+                coroutineScope.launch {
+                    onFoodRowClick(foodItem)
+                }},
             modifier = Modifier
                 .width(50.dp)
                 .height(50.dp)

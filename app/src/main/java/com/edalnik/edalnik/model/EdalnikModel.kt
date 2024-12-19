@@ -3,27 +3,32 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.io.FileNotFoundException
 
 
 class EdalnikModel() {
     private val foodList: MutableList<FoodItem>
-    private val chosenFood: MutableList<FoodItem> = mutableListOf()
+    private val _chosenFood = MutableStateFlow<List<FoodItem>>(emptyList())
+    val chosenFood: StateFlow<List<FoodItem>> = _chosenFood.asStateFlow()
 
     init {
         foodList = loadFoodData()
     }
     fun addFood(food: FoodItem) {
-        food.amount++
-        chosenFood.add(food)
+        food.amount = MutableStateFlow(1)
+        _chosenFood.value += food
+        Log.d("ABOBAaaa",food.amount.value.toString())
     }
 
     fun reduceChosenAmount(food: FoodItem) {
-        chosenFood.forEachIndexed { index, foodItem ->
+        _chosenFood.value.forEachIndexed { index, foodItem ->
             if(foodItem.name == food.name)
             {
-                chosenFood[index].amount--
-                if (chosenFood[index].amount == 0) {
+                _chosenFood.value[index].amount.value--
+                if (_chosenFood.value[index].amount.value == 0) {
                     deleteChosenRow(foodItem, index)
                 }
                 return
@@ -33,12 +38,17 @@ class EdalnikModel() {
 
     fun deleteChosenRow(food: FoodItem, supIndex: Int = -1) {
         if (supIndex != -1) {
-            chosenFood.removeAt(supIndex)
+            if (supIndex in _chosenFood.value.indices) {
+                val mutableList = _chosenFood.value.toMutableList()
+                mutableList.removeAt(supIndex)
+                _chosenFood.value = mutableList
+            }
             return
+
         }
-        chosenFood.forEachIndexed { index, foodItem ->
+       _chosenFood.value.forEachIndexed { index, foodItem ->
             if (foodItem.name == food.name) {
-                chosenFood.removeAt(index)
+                _chosenFood.value -= foodItem
                 return
             }
         }
@@ -48,17 +58,11 @@ class EdalnikModel() {
         return foodList
     }
 
-    fun getChosenFood(): MutableList<FoodItem> {
-        return chosenFood
-    }
 
     fun isExistOnChosen(food: FoodItem): Boolean {
-        chosenFood.forEachIndexed { index, foodItem ->
-            if(foodItem.name == food.name)
-            {
-                chosenFood[index].amount++
-                return true
-            }
+        _chosenFood.value.find {it.name == food.name}?.let { foodItem ->
+            foodItem.amount.value +=1
+            return true
         }
         return false
     }
