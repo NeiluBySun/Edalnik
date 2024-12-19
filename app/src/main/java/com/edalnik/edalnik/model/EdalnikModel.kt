@@ -1,6 +1,7 @@
 package com.edalnik.edalnik.model
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,8 @@ import java.io.FileNotFoundException
 class EdalnikModel() {
     private val foodList: MutableList<FoodItem>
     private val _chosenFood = MutableStateFlow<List<FoodItem>>(emptyList())
+    private var currentCalories:Float =  0F
+    var targetCalories = MutableStateFlow<Float>(2300F)
     val chosenFood: StateFlow<List<FoodItem>> = _chosenFood.asStateFlow()
 
     init {
@@ -20,9 +23,7 @@ class EdalnikModel() {
     fun addFood(food: FoodItem) {
         food.amount = MutableStateFlow(1)
         _chosenFood.value += food
-        Log.d("ABOBAaaa",food.amount.value.toString())
     }
-
     fun reduceChosenAmount(food: FoodItem) {
         _chosenFood.value.forEachIndexed { index, foodItem ->
             if(foodItem.name == food.name)
@@ -34,6 +35,16 @@ class EdalnikModel() {
                 return
             }
         }
+    }
+
+    fun calculateCalories() {
+        var total = 0U
+        _chosenFood.value.forEach { foodItem ->
+            total += foodItem
+                .calories
+                .split(" ")[0].toUInt()
+        }
+        currentCalories = total
     }
 
     fun deleteChosenRow(food: FoodItem, supIndex: Int = -1) {
@@ -58,6 +69,13 @@ class EdalnikModel() {
         return foodList
     }
 
+    fun getCurrentCalories(): UInt {
+        return currentCalories
+    }
+
+    fun setTargetCalories(target: UInt) {
+        targetCalories = MutableStateFlow(target)
+    }
 
     fun isExistOnChosen(food: FoodItem): Boolean {
         _chosenFood.value.find {it.name == food.name}?.let { foodItem ->
