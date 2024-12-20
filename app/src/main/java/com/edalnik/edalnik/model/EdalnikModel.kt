@@ -13,8 +13,8 @@ import java.io.FileNotFoundException
 class EdalnikModel() {
     private val foodList: MutableList<FoodItem>
     private val _chosenFood = MutableStateFlow<List<FoodItem>>(emptyList())
-    private var currentCalories:Float =  0F
-    var targetCalories = MutableStateFlow<Float>(2300F)
+    var currentCalories = MutableStateFlow(0F)
+    var targetCalories = MutableStateFlow(2300F)
     val chosenFood: StateFlow<List<FoodItem>> = _chosenFood.asStateFlow()
 
     init {
@@ -23,6 +23,7 @@ class EdalnikModel() {
     fun addFood(food: FoodItem) {
         food.amount = MutableStateFlow(1)
         _chosenFood.value += food
+        calculateCalories()
     }
     fun reduceChosenAmount(food: FoodItem) {
         _chosenFood.value.forEachIndexed { index, foodItem ->
@@ -32,19 +33,23 @@ class EdalnikModel() {
                 if (_chosenFood.value[index].amount.value == 0) {
                     deleteChosenRow(foodItem, index)
                 }
+                currentCalories.value -= foodItem
+                    .calories
+                    .split(" ")[0].toFloat()
                 return
             }
         }
     }
 
     fun calculateCalories() {
-        var total = 0U
+        var total = 0F
         _chosenFood.value.forEach { foodItem ->
-            total += foodItem
+            total += (foodItem
                 .calories
-                .split(" ")[0].toUInt()
+                .split(" ")[0].toFloat()
+                * foodItem.amount.value)
         }
-        currentCalories = total
+        currentCalories.value = total
     }
 
     fun deleteChosenRow(food: FoodItem, supIndex: Int = -1) {
@@ -54,6 +59,7 @@ class EdalnikModel() {
                 mutableList.removeAt(supIndex)
                 _chosenFood.value = mutableList
             }
+            calculateCalories()
             return
 
         }
@@ -69,12 +75,9 @@ class EdalnikModel() {
         return foodList
     }
 
-    fun getCurrentCalories(): UInt {
-        return currentCalories
-    }
 
-    fun setTargetCalories(target: UInt) {
-        targetCalories = MutableStateFlow(target)
+    fun setTargetCalories(target: Float) {
+        targetCalories.value = target
     }
 
     fun isExistOnChosen(food: FoodItem): Boolean {

@@ -12,7 +12,8 @@ class FoodViewModel() : ViewModel() {
     val cause = IllegalStateException("Devide by zero")
     private val repository = EdalnikModel()
     val chosenFood: StateFlow<List<FoodItem>> = repository.chosenFood
-    var targetCalories: StateFlow<UInt> = repository.targetCalories
+    var targetCalories: StateFlow<Float> = repository.targetCalories
+    var currentCalories: StateFlow<Float> = repository.currentCalories
 
     private val _foodListState = MutableStateFlow<List<FoodItem>>(emptyList())
     val foodListState: StateFlow<List<FoodItem>> = _foodListState
@@ -32,9 +33,6 @@ class FoodViewModel() : ViewModel() {
         return repository.getAllFood().toList()
     }
 
-    fun getCurrentCalories(): UInt {
-        return repository.getCurrentCalories()
-    }
 
     fun reduceChosenAmount(foodItem: FoodItem) {
         repository.reduceChosenAmount(foodItem)
@@ -42,11 +40,10 @@ class FoodViewModel() : ViewModel() {
 
     fun calculateCaloriesFraction(): Float {
 
-        val currentCalories = repository.getCurrentCalories()
-        if (targetCalories.value == 0U) {
+        if (targetCalories.value == 0F) {
             throw IllegalArgumentException("Target calories shouldn't be equal to zero", cause)
         }
-        return currentCalories.toFloat()/targetCalories.value.toFloat()
+        return currentCalories.value/targetCalories.value
     }
 
     fun deleteChosenRow(foodItem: FoodItem) {

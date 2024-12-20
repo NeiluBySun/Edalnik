@@ -23,7 +23,7 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
             FoodAppendingScreen(viewModel)
         }
         composable(BottomNavItem.Dashboard.route) {
-            DashboardScreen()
+            DashboardScreen(viewModel)
         }
         composable(BottomNavItem.Profile.route) {
             ProfileScreen()

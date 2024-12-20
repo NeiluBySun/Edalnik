@@ -4,17 +4,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.edalnik.edalnik.viewmodel.FoodViewModel
 import me.bytebeats.views.charts.pie.PieChart
 import me.bytebeats.views.charts.pie.PieChartData
 import me.bytebeats.views.charts.pie.render.SimpleSliceDrawer
 import me.bytebeats.views.charts.simpleChartAnimation
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(viewModel: FoodViewModel) {
+
+    val currentCalories by viewModel.currentCalories.collectAsState()
+    val targetCalories by viewModel.targetCalories.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -22,27 +29,33 @@ fun DashboardScreen() {
         contentAlignment = Alignment.Center
 
     ) {
-        PieChartView()
+        PieChartView(
+            currentCalories,
+            targetCalories
+        )
         Text(text = "Dashboard")
     }
 }
 
 @Composable
-fun PieChartView() {
+fun PieChartView(
+    currentCalories: Float,
+    targetCalories: Float
+) {
+    val target = if (currentCalories>targetCalories) 0F else targetCalories
     PieChart(
         pieChartData = PieChartData(
             slices = listOf(
                 PieChartData.Slice(
-                    100F,
-                    Color.LightGray
+                    target,
+                    Color(0xFF514F4F)
                 ),
                 PieChartData.Slice(
-                    20F,
-                    Color.Yellow
+                    currentCalories,
+                    Color(0xFFFFCD74)
                 ),
             )
         ),
-        // Optional properties.
         modifier = Modifier
             .size(200.dp),
         animation = simpleChartAnimation(),
