@@ -271,12 +271,6 @@ fun FoodItemRow(
                     .width(45.dp)
                     .height(40.dp)
                     .clip(RoundedCornerShape(16.dp)),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color(0xFFB22222), // Основной цвет кнопки
-//                    contentColor = Color.White,        // Цвет текста или иконок
-//                    disabledContainerColor = Color.Gray, // Цвет кнопки в неактивном состоянии
-//                    disabledContentColor = Color.LightGray // Цвет текста в неактивном состоянии
-//                ),
 
                 ) {
                 Icon(

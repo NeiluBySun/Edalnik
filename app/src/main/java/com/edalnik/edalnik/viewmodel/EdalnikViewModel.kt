@@ -1,19 +1,30 @@
 package com.edalnik.edalnik.viewmodel
 
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.edalnik.edalnik.model.ActivityLevel
 import com.edalnik.edalnik.model.FoodItem
 import com.edalnik.edalnik.model.EdalnikModel
+import com.edalnik.edalnik.model.Gender
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class FoodViewModel() : ViewModel() {
-    val cause = IllegalStateException("Devide by zero")
-    private val repository = EdalnikModel()
+class FoodViewModel(context: Context) : ViewModel() {
+    val cause = IllegalStateException("Devided by zero")
+    private val repository = EdalnikModel(context)
     val chosenFood: StateFlow<List<FoodItem>> = repository.chosenFood
     var targetCalories: StateFlow<Float> = repository.targetCalories
     var currentCalories: StateFlow<Float> = repository.currentCalories
+    var customTargetCalories: StateFlow<Float> = repository.customTargetCalories
+    var gender: StateFlow<Gender> = repository.gender
+    var height: StateFlow<Int> = repository.height
+    var weight: StateFlow<Int> = repository.weight
+    var age: StateFlow<Int> = repository.age
+    var activityLevel: StateFlow<ActivityLevel> = repository.activityLevel
+
+
 
     private val _foodListState = MutableStateFlow<List<FoodItem>>(emptyList())
     val foodListState: StateFlow<List<FoodItem>> = _foodListState
@@ -49,4 +60,29 @@ class FoodViewModel() : ViewModel() {
     fun deleteChosenRow(foodItem: FoodItem) {
         repository.deleteChosenRow(foodItem)
     }
+
+    fun setGender(newGender: Gender) {
+       repository.setGender(newGender)
+    }
+
+    fun setHeight(newHeight: Int) {
+        repository.setHeight(newHeight)
+    }
+
+    fun setWeight(newWeight: Int) {
+        repository.setWeight(newWeight)
+    }
+
+    fun setAge(newAge: Int) {
+        repository.setAge(newAge)
+    }
+
+    fun setActivityLevel(level: ActivityLevel) {
+        repository.setActivityLevel(level)
+    }
+
+    fun setCustomTargetCalories(calories: Float) {
+        repository.setCustomTargetCalories(calories)
+    }
+
 }

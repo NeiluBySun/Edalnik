@@ -26,7 +26,7 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
             DashboardScreen(viewModel)
         }
         composable(BottomNavItem.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(viewModel)
         }
     }
 }

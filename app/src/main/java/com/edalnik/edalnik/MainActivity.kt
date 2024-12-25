@@ -11,10 +11,10 @@ import com.edalnik.edalnik.viewmodel.FoodViewModel
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: FoodViewModel
+    private lateinit var viewModel : FoodViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(FoodViewModel::class.java)
+        viewModel = FoodViewModel(this)
         setContent {
             EdalnikTheme() {
                 MainScreen(viewModel)

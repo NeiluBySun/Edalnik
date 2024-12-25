@@ -33,7 +33,23 @@ fun DashboardScreen(viewModel: FoodViewModel) {
             currentCalories,
             targetCalories
         )
-        Text(text = "Dashboard")
+        Text(
+            text = "Набранные калории: ${currentCalories.toInt()} ккал",
+            color = Color.White,
+            modifier = Modifier.padding(top = 350.dp)
+        )
+        Text(
+            text = "Дневная норма: ${targetCalories.toInt()} ккал",
+            color = Color.White,
+            modifier = Modifier.padding(top = 400.dp)
+        )
+        Text(
+            text = if (currentCalories < targetCalories.toInt())
+                "Осталось наесть еще: ${(targetCalories- currentCalories).toInt()}"
+                else "Норма выполнена",
+            color = Color.White,
+            modifier = Modifier.padding(top = 450.dp)
+        )
     }
 }
 
